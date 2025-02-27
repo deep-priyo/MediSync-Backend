@@ -30,7 +30,8 @@ def analyze_image():
         image_bytes = uploaded_file.read()
 
         user_prompt = request.form.get("symptoms", "")
-
+        if user_prompt == "":
+            user_prompt = 'none'
         diagnosis = ImageModel.get_gemini_response(image_bytes, user_prompt)
 
         return jsonify({"diagnosis": diagnosis})
@@ -68,4 +69,4 @@ def get_report():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)), debug=True)
