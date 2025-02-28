@@ -1,5 +1,5 @@
 import os
-
+import prescription
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import re
@@ -66,6 +66,30 @@ def get_report():
         "medicalHistory": medical_history,
         "diagnosis": cleaned_diagnosis
     })
+
+
+@app.route("/prescriptionanalyze", methods=["POST"])
+def analyze_prescription():
+    try:
+        if "image" not in request.files:
+            return jsonify({"error": "No prescription image uploaded"}), 400
+
+        uploaded_file = request.files["image"]
+
+        # ✅ Save the uploaded file to a temporary directory
+        temp_dir = "temp_images"
+        os.makedirs(temp_dir, exist_ok=True)  # Ensure the directory exists
+        image_path = os.path.join(temp_dir, uploaded_file.filename)
+        uploaded_file.save(image_path)  # Save file to disk
+
+        # ✅ Process the image using the image path
+        extracted_text = prescription.process_prescription(image_path)
+
+        return jsonify({"extracted_text": extracted_text})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == '__main__':
